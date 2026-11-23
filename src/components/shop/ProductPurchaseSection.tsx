@@ -274,7 +274,7 @@ export default function ProductPurchaseSection({
     ? `Bonjour, je souhaite commander : ${localizedName} (Taille : ${activeVariant.displayLabel}) au prix de ${currentPriceFormatted}`
     : `Hello, I would like to order: ${localizedName} (Size: ${activeVariant.displayLabel}) for ${currentPriceFormatted}`;
 
-  const whatsappUrl = `https://wa.me/212600000000?text=${encodeURIComponent(whatsappMessage)}`;
+  const whatsappUrl = `https://wa.me/212641517831?text=${encodeURIComponent(whatsappMessage)}`;
 
   return (
     <div className="flex flex-col gap-6">

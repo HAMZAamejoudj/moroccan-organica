@@ -1,15 +1,12 @@
-import { withAuth } from 'next-auth/middleware';
-import type { NextRequestWithAuth } from 'next-auth/middleware';
-import { NextResponse } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
+import { getToken } from 'next-auth/jwt';
 
 const locales = ['en', 'ar', 'fr'];
 const defaultLocale = 'en';
 
 // Define the middleware function
-async function middleware(req: NextRequestWithAuth) {
+export async function middleware(req: NextRequest) {
     const { pathname } = req.nextUrl;
-    const token = req.nextauth.token;
-    const isAuth = !!token;
 
     const localePrefixedAuthApi = locales.find(
         (locale) => pathname === `/${locale}/api/auth` || pathname.startsWith(`/${locale}/api/auth/`)
@@ -39,40 +36,53 @@ async function middleware(req: NextRequestWithAuth) {
         return NextResponse.rewrite(url);
     }
 
+    // 2. Auth protection (ONLY executed for admin and login routes to save CPU and function invocations)
     const isAuthPage = pathname === '/login' || pathname.startsWith('/login/');
+    const isAdminPage = pathname.startsWith('/admin');
 
-    // 2. Auth protection
-    if (isAuthPage) {
-        if (isAuth) {
-            return NextResponse.redirect(new URL(`/admin`, req.url));
-        }
-        return null;
-    }
+    if (isAuthPage || isAdminPage) {
+        const token = await getToken({
+            req,
+            secret: process.env.NEXTAUTH_SECRET,
+        });
+        const isAuth = !!token;
 
-    if (pathname.startsWith('/admin')) {
-        if (!isAuth) {
-            const from = pathname + req.nextUrl.search;
-            // Redirect to root login directly
-            return NextResponse.redirect(
-                new URL(`/login?from=${encodeURIComponent(from)}`, req.url)
-            );
+        if (isAuthPage) {
+            if (isAuth) {
+                return NextResponse.redirect(new URL(`/admin`, req.url));
+            }
+            return NextResponse.next();
         }
 
-        if (token?.role !== 'ADMIN') {
-            return NextResponse.redirect(new URL(`/en`, req.url));
+        if (isAdminPage) {
+            if (!isAuth) {
+                const from = pathname + req.nextUrl.search;
+                return NextResponse.redirect(
+                    new URL(`/login?from=${encodeURIComponent(from)}`, req.url)
+                );
+            }
+
+            if (token?.role !== 'ADMIN') {
+                return NextResponse.redirect(new URL(`/en`, req.url));
+            }
         }
     }
 
     return NextResponse.next();
 }
 
-// Export the middleware wrapped with auth
-export default withAuth(middleware, {
-    callbacks: {
-        authorized: () => true,
-    },
-});
+export default middleware;
 
 export const config = {
-    matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+    matcher: [
+        /*
+         * Match all request paths except:
+         * - /api routes
+         * - /_next/static (static files)
+         * - /_next/image (image optimization files)
+         * - favicon.ico, sitemap.xml, robots.txt
+         * - Static file extensions (.svg, .png, .jpg, etc.)
+         */
+        '/((?!api|_next/static|_next/image|favicon\\.ico|sitemap\\.xml|robots\\.txt|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|txt|xml)$).*)',
+    ],
 };

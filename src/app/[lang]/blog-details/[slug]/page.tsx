@@ -14,6 +14,35 @@ import type { BlogPostFull } from "@/types/blog";
 import { getValidImageUrl, getLocalizedHref } from '@/lib/utils';
 import { BlogCard } from '@/components/blog/BlogCard';
 import { articleSchema, breadcrumbSchema, renderSchemas } from '@/lib/seo/schemas';
+import { supabase } from '@/lib/supabase';
+
+export const revalidate = 86400; // 24 hours ISR (Edge CDN cached)
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+    try {
+        const { data: posts } = await supabase
+            .from('BlogPost')
+            .select('slug')
+            .eq('status', 'published');
+
+        if (!posts) return [];
+
+        const languages = ['en', 'ar', 'fr'];
+        const params: { lang: string; slug: string }[] = [];
+        for (const p of posts) {
+            if (p.slug) {
+                for (const lang of languages) {
+                    params.push({ lang, slug: p.slug });
+                }
+            }
+        }
+        return params;
+    } catch (e) {
+        console.error('Failed to generate static params for blog posts:', e);
+        return [];
+    }
+}
 
 interface PageProps {
     params: Promise<{

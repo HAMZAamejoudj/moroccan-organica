@@ -4,9 +4,37 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { getGlobalSeoSettings } from "@/lib/queries";
 import { getLocalizedHref } from "@/lib/utils";
+import { supabase } from "@/lib/supabase";
 
-// Re-validate content every hour
-export const revalidate = 3600;
+// Re-validate content every hour & allow dynamic fallback
+export const revalidate = 86400; // 24 hours ISR (Edge CDN cached)
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+    try {
+        const { data: pages } = await supabase
+            .from('StaticPage')
+            .select('translations:StaticPageTranslation(slug, language)');
+
+        if (!pages) return [];
+
+        const params: { lang: string; slug: string }[] = [];
+        for (const p of pages) {
+            for (const t of (p.translations as any[]) || []) {
+                if (t.slug && t.language) {
+                    const trimmedSlug = t.slug.trim();
+                    if (trimmedSlug && trimmedSlug !== '/' && !trimmedSlug.includes(' ')) {
+                        params.push({ lang: t.language, slug: trimmedSlug });
+                    }
+                }
+            }
+        }
+        return params;
+    } catch (e) {
+        console.error('Failed to generate static params for generic static pages:', e);
+        return [];
+    }
+}
 
 interface PageProps {
     params: Promise<{

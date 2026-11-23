@@ -13,6 +13,34 @@ import { WholesaleQuoteForm } from "@/components/shop/WholesaleQuoteForm";
 import InnerHero from "@/components/common/InnerHero";
 import { HtmlContent } from "@/components/common/HtmlContent";
 import { getLocalizedHref } from "@/lib/utils";
+import { supabase } from "@/lib/supabase";
+
+export const revalidate = 86400; // 24 hours ISR (Edge CDN cached)
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+    try {
+        const { data: products } = await supabase
+            .from('Product')
+            .select('translations:ProductTranslation(slug, language)')
+            .eq('isAvailable', true);
+
+        if (!products) return [];
+
+        const params: { lang: string; slug: string }[] = [];
+        for (const p of products) {
+            for (const t of (p.translations as any[]) || []) {
+                if (t.slug && t.language) {
+                    params.push({ lang: t.language, slug: t.slug });
+                }
+            }
+        }
+        return params;
+    } catch (e) {
+        console.error('Failed to generate static params for organica products:', e);
+        return [];
+    }
+}
 
 const copy = {
     en: {

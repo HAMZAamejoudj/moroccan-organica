@@ -1,5 +1,8 @@
 import { redirect } from "next/navigation";
 
+export const revalidate = 86400;
+export const dynamicParams = true;
+
 export default async function BenefitPostRedirect({ params }: { params: Promise<{ lang: string, slug: string }> }) {
     const { lang, slug } = await params;
     redirect(`/${lang}/organica/${slug}`);

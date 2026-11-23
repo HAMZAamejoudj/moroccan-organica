@@ -95,6 +95,17 @@ const nextConfig: NextConfig = {
         destination: '/:lang/blog-details/:slug',
         permanent: true,
       },
+      // Benefits redirects (handled at edge CDN)
+      {
+        source: '/benefits/:slug',
+        destination: '/organica/:slug',
+        permanent: true,
+      },
+      {
+        source: '/:lang(fr|ar|en)/benefits/:slug',
+        destination: '/:lang/organica/:slug',
+        permanent: true,
+      },
     ];
   },
 };

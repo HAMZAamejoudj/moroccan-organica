@@ -1,5 +1,5 @@
 "use client";
-// Updated: 2026-11-23 - WhatsApp Support Notice Modal with Official Icon & Compact Design
+// Updated: 2026-11-23 17:39 - WhatsApp Support Notice Modal v1.2 with Official Icon & Compact Design
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";

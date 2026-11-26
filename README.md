@@ -11,7 +11,7 @@ A premium, bilingual (English/Arabic) e-commerce platform for Moroccan organic p
 - **Authentication**: NextAuth.js (Admin only)
 - **UI Components**: Custom components with premium design
 
-### 📁 Project Structure
+## 📁 Project Structure
 
 ```
 src/

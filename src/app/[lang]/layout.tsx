@@ -78,6 +78,9 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
     },
     authors: [{ name: "Organica group" }],
     robots: "index, follow",
+    verification: {
+      google: "GYexpNY8JLj8oWDm_xFozN_w0NFFyseYNRh1NamgLUM",
+    },
     other: {
       "revisit-after": "1 days",
       "X-UA-Compatible": "IE=edge",

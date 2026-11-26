@@ -18,7 +18,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // 2. Fetch Products for dynamic routes
     const { data: products } = await supabaseAdmin
         .from('Product')
-        .select('id, translations:ProductTranslation(slug, language)')
+        .select('id, placement, translations:ProductTranslation(slug, language)')
         .eq('isAvailable', true);
 
     // 3. Fetch Static Pages (Organica custom pages)
@@ -53,11 +53,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     // Process Products
     products?.forEach(product => {
+        const section = (product as any).placement === 'shop' ? 'shop' : 'organica';
         LANGUAGES.forEach(lang => {
             const trans = product.translations?.find((t: any) => t.language === lang) || product.translations?.find((t: any) => t.language === 'en');
             if (trans?.slug) {
                 const langPrefix = lang === 'en' ? '' : `/${lang}`;
-                const url = `${BASE_URL}${langPrefix}/organica/${trans.slug}`;
+                const url = `${BASE_URL}${langPrefix}/${section}/${trans.slug}`;
                 
                 sitemapEntries.push({
                     url,
@@ -66,9 +67,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
                     priority: 0.7,
                     alternates: {
                         languages: {
-                            en: `${BASE_URL}/organica/${product.translations?.find((t: any) => t.language === 'en')?.slug || trans.slug}`,
-                            fr: `${BASE_URL}/fr/organica/${product.translations?.find((t: any) => t.language === 'fr')?.slug || trans.slug}`,
-                            ar: `${BASE_URL}/ar/organica/${product.translations?.find((t: any) => t.language === 'ar')?.slug || trans.slug}`,
+                            en: `${BASE_URL}/${section}/${product.translations?.find((t: any) => t.language === 'en')?.slug || trans.slug}`,
+                            fr: `${BASE_URL}/fr/${section}/${product.translations?.find((t: any) => t.language === 'fr')?.slug || trans.slug}`,
+                            ar: `${BASE_URL}/ar/${section}/${product.translations?.find((t: any) => t.language === 'ar')?.slug || trans.slug}`,
                         }
                     }
                 });

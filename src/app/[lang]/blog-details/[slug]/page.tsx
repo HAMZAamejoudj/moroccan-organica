@@ -16,7 +16,7 @@ import { BlogCard } from '@/components/blog/BlogCard';
 import { articleSchema, breadcrumbSchema, renderSchemas } from '@/lib/seo/schemas';
 import { supabase } from '@/lib/supabase';
 
-export const revalidate = 86400; // 24 hours ISR (Edge CDN cached)
+export const revalidate = 2592000; // 30 days ISR (on-demand revalidation handles edits)
 export const dynamicParams = true;
 
 export async function generateStaticParams() {

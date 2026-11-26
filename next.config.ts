@@ -108,6 +108,34 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async rewrites() {
+    return {
+      beforeFiles: [
+        // Rewrite locale-prefixed NextAuth API routes at the Edge CDN
+        {
+          source: '/:lang(en|ar|fr)/api/auth',
+          destination: '/api/auth',
+        },
+        {
+          source: '/:lang(en|ar|fr)/api/auth/:path*',
+          destination: '/api/auth/:path*',
+        },
+      ],
+      afterFiles: [
+        // Rewrite default English root path at the Edge CDN (0ms Fluid CPU)
+        {
+          source: '/',
+          destination: '/en',
+        },
+        // Rewrite locale-less public paths to /en/... at the Edge CDN (0ms Fluid CPU)
+        {
+          source: '/:path((?!en(?:/|$)|ar(?:/|$)|fr(?:/|$)|api(?:/|$)|admin(?:/|$)|login(?:/|$)|_next(?:/|$)|.*\\.).*)',
+          destination: '/en/:path',
+        },
+      ],
+      fallback: [],
+    };
+  },
 };
 
 export default nextConfig;

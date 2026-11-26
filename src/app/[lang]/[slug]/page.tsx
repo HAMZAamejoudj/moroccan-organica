@@ -6,9 +6,10 @@ import { getGlobalSeoSettings } from "@/lib/queries";
 import { getLocalizedHref } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
 
-// Re-validate content every hour & allow dynamic fallback
-export const revalidate = 86400; // 24 hours ISR (Edge CDN cached)
-export const dynamicParams = true;
+// On-demand revalidation handles edits; 30-day fallback prevents hourly ISR storms.
+// dynamicParams = false rejects unknown bot-scanned paths at the Edge CDN (0ms CPU, 0 ISR writes).
+export const revalidate = 2592000;
+export const dynamicParams = false;
 
 export async function generateStaticParams() {
     try {

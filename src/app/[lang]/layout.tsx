@@ -85,6 +85,8 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   };
 }
 
+export const dynamicParams = false;
+
 export async function generateStaticParams() {
   return [{ lang: 'en' }, { lang: 'ar' }, { lang: 'fr' }]
 }

@@ -15,31 +15,43 @@ import { HtmlContent } from "@/components/common/HtmlContent";
 import { getLocalizedHref } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
 
-export const revalidate = 86400; // 24 hours ISR (Edge CDN cached)
+export const revalidate = 2592000; // 30 days ISR (on-demand revalidation handles edits)
 export const dynamicParams = true;
 
 export async function generateStaticParams() {
+    const params: { lang: string; slug: string }[] = [];
+    const languages = ['en', 'ar', 'fr'];
+
+    // Pre-render benefit articles under /organica/[slug]
+    for (const benefit of benefitsData) {
+        if (benefit.slug) {
+            for (const lang of languages) {
+                params.push({ lang, slug: benefit.slug });
+            }
+        }
+    }
+
     try {
         const { data: products } = await supabase
             .from('Product')
-            .select('translations:ProductTranslation(slug, language)')
-            .eq('isAvailable', true);
+            .select('placement, translations:ProductTranslation(slug, language)')
+            .eq('isAvailable', true)
+            .neq('placement', 'shop');
 
-        if (!products) return [];
-
-        const params: { lang: string; slug: string }[] = [];
-        for (const p of products) {
-            for (const t of (p.translations as any[]) || []) {
-                if (t.slug && t.language) {
-                    params.push({ lang: t.language, slug: t.slug });
+        if (products) {
+            for (const p of products) {
+                for (const t of (p.translations as any[]) || []) {
+                    if (t.slug && t.language) {
+                        params.push({ lang: t.language, slug: t.slug });
+                    }
                 }
             }
         }
-        return params;
     } catch (e) {
         console.error('Failed to generate static params for organica products:', e);
-        return [];
     }
+
+    return params;
 }
 
 const copy = {

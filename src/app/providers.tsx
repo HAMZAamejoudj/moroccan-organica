@@ -8,7 +8,7 @@ import i18n from '../lib/i18n';
 import { useEffect } from 'react';
 import { CartProvider } from '@/components/shop/CartContext';
 
-export function Providers({ children, lang }: { children: React.ReactNode, lang?: string }) {
+export function Providers({ children, lang, enableAuth = false }: { children: React.ReactNode, lang?: string, enableAuth?: boolean }) {
     const [queryClient] = useState(() => new QueryClient({
         defaultOptions: {
             queries: {
@@ -24,11 +24,17 @@ export function Providers({ children, lang }: { children: React.ReactNode, lang?
         }
     }, [lang]);
 
+    const content = <CartProvider>{children}</CartProvider>;
+
     return (
         <QueryClientProvider client={queryClient}>
-            <SessionProvider basePath="/api/auth">
-                <CartProvider>{children}</CartProvider>
-            </SessionProvider>
+            {enableAuth ? (
+                <SessionProvider basePath="/api/auth" refetchOnWindowFocus={false}>
+                    {content}
+                </SessionProvider>
+            ) : (
+                content
+            )}
         </QueryClientProvider>
     );
 }

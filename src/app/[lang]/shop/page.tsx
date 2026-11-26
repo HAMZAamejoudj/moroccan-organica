@@ -104,10 +104,32 @@ export default async function ShopPage({ params }: { params: Params }) {
         }));
     }
 
+    // Strip heavy detail/SEO fields not rendered on the shop listing grid
+    // to shrink the SSR/ISR HTML & RSC payload from ~1.35 MB down to ~150 KB.
+    const slimProducts: ShopProductDB[] = products.map((p) => ({
+        ...p,
+        gallery: [],
+        variants: [],
+        details: '',
+        detailsAr: '',
+        detailsFr: '',
+        h1: '',
+        h1Ar: '',
+        h1Fr: '',
+        metaTitle: '',
+        metaDesc: '',
+        keywords: '',
+        ogImage: undefined,
+        canonical: undefined,
+        description: p.description ? p.description.slice(0, 260) : '',
+        descriptionAr: p.descriptionAr ? p.descriptionAr.slice(0, 260) : '',
+        descriptionFr: p.descriptionFr ? p.descriptionFr.slice(0, 260) : '',
+    }));
+
     return (
         <ShopPageClient
             lang={lang}
-            initialProducts={products}
+            initialProducts={slimProducts}
             categories={categories}
             dict={dict as Record<string, unknown>}
         />

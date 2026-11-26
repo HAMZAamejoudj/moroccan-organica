@@ -10,7 +10,7 @@ export default async function AdminLayout({
     return (
         <html lang="en">
             <body className="antialiased">
-                <Providers lang="en">
+                <Providers lang="en" enableAuth={true}>
                     <AdminLayoutClient lang="en">
                         {children}
                     </AdminLayoutClient>

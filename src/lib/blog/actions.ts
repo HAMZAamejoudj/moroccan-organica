@@ -350,7 +350,7 @@ export async function getPublishedPosts(
       };
     },
     ['published-posts', options ? JSON.stringify(options) : 'default'],
-    { tags: [CACHE_TAGS.BLOG_POSTS], revalidate: 3600 }
+    { tags: [CACHE_TAGS.BLOG_POSTS], revalidate: 2592000 }
   )();
 }
 
@@ -477,7 +477,7 @@ export async function getPublishedPostBySlug(slug: string): Promise<BlogPostFull
   const cachedResult = await unstable_cache(
     getFromDb,
     ['published-post-slug', slug],
-    { tags: [CACHE_TAGS.BLOG_POSTS, CACHE_TAGS.BLOG_POST(slug)], revalidate: 3600 }
+    { tags: [CACHE_TAGS.BLOG_POSTS, CACHE_TAGS.BLOG_POST(slug)], revalidate: 2592000 }
   )();
 
   if (cachedResult) return cachedResult;
@@ -765,7 +765,7 @@ export async function getBlogCategories(): Promise<BlogCategory[]> {
       }
     },
     ['blog-categories'],
-    { tags: ['blog_categories'], revalidate: 3600 }
+    { tags: ['blog_categories'], revalidate: 2592000 }
   )();
 }
 
@@ -907,6 +907,6 @@ export async function getRelatedPosts(postId: string, categoryId: string | null,
       }
     },
     ['related-posts', postId, categoryId || 'all', String(limit)],
-    { tags: [CACHE_TAGS.BLOG_POSTS, `related-${postId}`], revalidate: 3600 }
+    { tags: [CACHE_TAGS.BLOG_POSTS, `related-${postId}`], revalidate: 2592000 }
   )();
 }

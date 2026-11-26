@@ -9,7 +9,7 @@ export default function LoginLayout({
     return (
         <html lang="en">
             <body className="antialiased">
-                <Providers lang="en">
+                <Providers lang="en" enableAuth={true}>
                     {children}
                 </Providers>
             </body>

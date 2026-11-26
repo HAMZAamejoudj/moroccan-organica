@@ -15,15 +15,16 @@ import { productSchema, breadcrumbSchema, renderSchemas } from "@/lib/seo/schema
 import Script from "next/script";
 import { supabase } from "@/lib/supabase";
 
-export const revalidate = 86400; // 24 hours ISR (Edge CDN cached)
+export const revalidate = 2592000; // 30 days ISR (on-demand revalidation handles edits)
 export const dynamicParams = true;
 
 export async function generateStaticParams() {
     try {
         const { data: products } = await supabase
             .from('Product')
-            .select('translations:ProductTranslation(slug, language)')
-            .eq('isAvailable', true);
+            .select('placement, translations:ProductTranslation(slug, language)')
+            .eq('isAvailable', true)
+            .eq('placement', 'shop');
 
         if (!products) return [];
 

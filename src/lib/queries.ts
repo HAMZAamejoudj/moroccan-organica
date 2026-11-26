@@ -45,7 +45,7 @@ export const getStaticPageBySystemName = async (systemName: string, lang: string
     const cachedResult = await unstable_cache(
         () => _getStaticPageBySystemName(systemName, lang),
         [CACHE_TAGS.STATIC_PAGE(systemName), lang],
-        { tags: [CACHE_TAGS.STATIC_PAGES, CACHE_TAGS.STATIC_PAGE(systemName)], revalidate: 86400 }
+        { tags: [CACHE_TAGS.STATIC_PAGES, CACHE_TAGS.STATIC_PAGE(systemName)], revalidate: 2592000 }
     )();
 
     if (cachedResult) return cachedResult;
@@ -81,7 +81,7 @@ export const getGlobalSeoSettings = async (lang: string) => {
     const cachedResult = await unstable_cache(
         () => _getGlobalSeoSettings(lang),
         [CACHE_TAGS.STATIC_PAGES, `global-seo-${lang}`],
-        { tags: [CACHE_TAGS.STATIC_PAGES], revalidate: 86400 }
+        { tags: [CACHE_TAGS.STATIC_PAGES], revalidate: 2592000 }
     )();
 
     if (cachedResult) return cachedResult;
@@ -131,7 +131,7 @@ export const getStaticPageBySlug = async (slug: string, lang: string) => {
     const cachedResult = await unstable_cache(
         () => _getStaticPageBySlug(slug, lang),
         [CACHE_TAGS.STATIC_PAGES, `static-slug-${slug}-${lang}`],
-        { tags: [CACHE_TAGS.STATIC_PAGES], revalidate: 86400 }
+        { tags: [CACHE_TAGS.STATIC_PAGES], revalidate: 2592000 }
     )();
 
     if (cachedResult) return cachedResult;
@@ -182,7 +182,7 @@ export const getFeaturedProducts = async (lang: string) => {
     const cachedResult = await unstable_cache(
         () => _getFeaturedProducts(lang),
         [CACHE_TAGS.PRODUCTS, `featured-${lang}`],
-        { tags: [CACHE_TAGS.PRODUCTS], revalidate: 86400 }
+        { tags: [CACHE_TAGS.PRODUCTS], revalidate: 2592000 }
     )();
 
     if (cachedResult && cachedResult.length > 0) return cachedResult;
@@ -247,7 +247,7 @@ export const getTopSaleProducts = async (lang: string) => {
     const cachedResult = await unstable_cache(
         () => _getTopSaleProducts(lang),
         [CACHE_TAGS.PRODUCTS, `topsale-${lang}`],
-        { tags: [CACHE_TAGS.PRODUCTS], revalidate: 86400 }
+        { tags: [CACHE_TAGS.PRODUCTS], revalidate: 2592000 }
     )();
 
     if (cachedResult && cachedResult.length > 0) return cachedResult;
@@ -311,7 +311,7 @@ export const getCatalogueProducts = async (lang: string) => {
     const cachedResult = await unstable_cache(
         () => _getCatalogueProducts(lang),
         [CACHE_TAGS.PRODUCTS, `catalogue-${lang}`],
-        { tags: [CACHE_TAGS.PRODUCTS], revalidate: 86400 }
+        { tags: [CACHE_TAGS.PRODUCTS], revalidate: 2592000 }
     )();
 
     if (cachedResult && cachedResult.length > 0) return cachedResult;
@@ -345,7 +345,7 @@ export const getAllCategories = async (lang: string) => {
     const cachedResult = await unstable_cache(
         () => _getAllCategories(lang),
         [CACHE_TAGS.CATEGORIES, `all-categories-${lang}`],
-        { tags: [CACHE_TAGS.CATEGORIES], revalidate: 86400 }
+        { tags: [CACHE_TAGS.CATEGORIES], revalidate: 2592000 }
     )();
 
     if (cachedResult && cachedResult.length > 0) return cachedResult;

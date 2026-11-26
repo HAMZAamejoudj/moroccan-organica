@@ -188,7 +188,7 @@ export async function getProducts(options?: {
   return unstable_cache(
     fetchProducts,
     ['all-products', options ? JSON.stringify(options) : 'default'],
-    { tags: [CACHE_TAGS.PRODUCTS], revalidate: 3600 }
+    { tags: [CACHE_TAGS.PRODUCTS], revalidate: 2592000 }
   )();
 }
 
@@ -229,7 +229,7 @@ export async function getProductBySlug(slug: string, lang: LanguageCode = 'en'):
   const cachedResult = await unstable_cache(
     getFromDb,
     ['product-by-slug', slug, lang],
-    { tags: [CACHE_TAGS.PRODUCTS, `product-slug-${slug}`], revalidate: 3600 }
+    { tags: [CACHE_TAGS.PRODUCTS, `product-slug-${slug}`], revalidate: 2592000 }
   )();
 
   // If cache returned null, fallback to DB directly to ensure we don't serve a stale "not found"
@@ -291,7 +291,7 @@ export async function getProductById(id: string, lang: LanguageCode = 'en'): Pro
   const cachedResult = await unstable_cache(
     getFromDb,
     ['product-by-id', id, lang],
-    { tags: [CACHE_TAGS.PRODUCTS, CACHE_TAGS.PRODUCT(id)], revalidate: 3600 }
+    { tags: [CACHE_TAGS.PRODUCTS, CACHE_TAGS.PRODUCT(id)], revalidate: 2592000 }
   )();
 
   // If cache returned null, fallback to DB directly to ensure we don't serve a stale "not found"
@@ -612,7 +612,7 @@ export async function getRelatedProducts(
       }
     },
     ['related-products', productId, categoryId || 'all', String(limit), lang, placement || 'all'],
-    { tags: [CACHE_TAGS.PRODUCTS, `related-${productId}`], revalidate: 3600 }
+    { tags: [CACHE_TAGS.PRODUCTS, `related-${productId}`], revalidate: 2592000 }
   )();
 }
 
@@ -644,6 +644,6 @@ export async function getFeaturedProducts(limit: number = 8, lang: LanguageCode 
       }
     },
     ['featured-products', String(limit), lang],
-    { tags: [CACHE_TAGS.PRODUCTS, 'featured'], revalidate: 3600 }
+    { tags: [CACHE_TAGS.PRODUCTS, 'featured'], revalidate: 2592000 }
   )();
 }

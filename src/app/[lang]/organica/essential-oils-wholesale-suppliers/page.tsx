@@ -3,6 +3,7 @@ import { getStaticPageBySystemName, getGlobalSeoSettings, getCatalogueProducts }
 import { Metadata } from "next";
 import CatalogueClient from "../CatalogueClient";
 import { getLocalizedHref } from "@/lib/utils";
+import { buildAlternates } from "@/lib/seo/alternates";
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
     const { lang } = await params;
@@ -43,9 +44,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
             images: page?.translation?.ogImage ? [page.translation.ogImage] : (globalSeo?.ogImage ? [globalSeo.ogImage] : []),
             url: `https://www.moroccanorganica.com${getLocalizedHref('/organica/essential-oils-wholesale-suppliers', lang)}`,
         },
-        alternates: {
-            canonical: page?.translation?.canonical || `https://www.moroccanorganica.com${getLocalizedHref('/organica/essential-oils-wholesale-suppliers', lang)}`,
-        }
+        alternates: buildAlternates('/organica/essential-oils-wholesale-suppliers', lang, page?.translation?.canonical),
     };
 }
 

@@ -106,8 +106,23 @@ async function _getStaticPageBySlug(slug: string, lang: string) {
 
         const translation = (page.translations?.[0] as any) || null;
 
+        // Fetch sibling translations across all languages for accurate hreflang alternates
+        const { data: allTranslations } = await supabase
+            .from('StaticPageTranslation')
+            .select('language, slug')
+            .eq('staticPageId', page.id);
+
+        const siblingSlugs: { en?: string; fr?: string; ar?: string } = {};
+        for (const t of allTranslations || []) {
+            if (typeof t.slug === 'string' && (t.language === 'en' || t.language === 'fr' || t.language === 'ar')) {
+                const langKey: 'en' | 'fr' | 'ar' = t.language;
+                siblingSlugs[langKey] = t.slug;
+            }
+        }
+
         return {
             ...page,
+            siblingSlugs,
             translation: translation ? {
                 id: translation.id,
                 language: translation.language,
@@ -207,7 +222,7 @@ async function _getTopSaleProducts(lang: string) {
             .eq('placement', 'topsale')
             .eq('isAvailable', true)
             .order('createdAt', { ascending: false })
-            .limit(12);
+            .limit(24);
 
         if (error || !products) return [];
 
@@ -229,7 +244,7 @@ async function _getTopSaleProducts(lang: string) {
                 category: catTrans.name || "Category",
                 price: variant ? Number(variant.price) : Number(p.basePrice),
                 volume: variant ? variant.sizeName : "Standard",
-                name: transEn.name || trans.name || "Product",
+                name: trans.name || transEn.name || "Product",
                 nameAr: transAr.name || trans.name || "Product",
                 descriptionEn: transEn.description || "",
                 descriptionAr: transAr.description || "",
@@ -246,7 +261,7 @@ async function _getTopSaleProducts(lang: string) {
 export const getTopSaleProducts = async (lang: string) => {
     const cachedResult = await unstable_cache(
         () => _getTopSaleProducts(lang),
-        [CACHE_TAGS.PRODUCTS, `topsale-${lang}`],
+        [CACHE_TAGS.PRODUCTS, `topsale-v2-${lang}`],
         { tags: [CACHE_TAGS.PRODUCTS], revalidate: 2592000 }
     )();
 
@@ -293,7 +308,7 @@ async function _getCatalogueProducts(lang: string) {
                 category: catTrans.name || "Category",
                 price: variant ? Number(variant.price) : Number(p.basePrice),
                 volume: variant ? variant.sizeName : "Standard",
-                name: transEn.name || trans.name || "Product",
+                name: trans.name || transEn.name || "Product",
                 nameAr: transAr.name || trans.name || "Product",
                 descriptionEn: transEn.description || "",
                 descriptionAr: transAr.description || "",

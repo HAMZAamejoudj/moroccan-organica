@@ -13,7 +13,10 @@ import { WholesaleQuoteForm } from "@/components/shop/WholesaleQuoteForm";
 import InnerHero from "@/components/common/InnerHero";
 import { HtmlContent } from "@/components/common/HtmlContent";
 import { getLocalizedHref } from "@/lib/utils";
+import { buildAlternates, buildLocalizedAlternates } from "@/lib/seo/alternates";
+import { breadcrumbSchema, webPageSchema, renderSchemas } from "@/lib/seo/schemas";
 import { supabase } from "@/lib/supabase";
+import Script from "next/script";
 
 export const revalidate = 2592000; // 30 days ISR (on-demand revalidation handles edits)
 export const dynamicParams = true;
@@ -124,9 +127,15 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
                 images: product.ogImage ? [product.ogImage] : (product.image ? [product.image] : (globalSeo?.ogImage ? [globalSeo.ogImage] : [])),
                 url: `https://www.moroccanorganica.com${getLocalizedHref(`/organica/${slug}`, lang)}`,
             },
-            alternates: {
-                canonical: product.canonical || `https://www.moroccanorganica.com${getLocalizedHref(`/organica/${slug}`, lang)}`,
-            }
+            alternates: buildLocalizedAlternates(
+                {
+                    en: `/organica/${product.slugs?.en || slug}`,
+                    fr: `/organica/${product.slugs?.fr || slug}`,
+                    ar: `/organica/${product.slugs?.ar || slug}`,
+                },
+                lang,
+                product.canonical
+            ),
         };
     }
 
@@ -152,9 +161,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
                 images: [benefit.image],
                 url: `https://www.moroccanorganica.com${getLocalizedHref(`/organica/${slug}`, lang)}`,
             },
-            alternates: {
-                canonical: `https://www.moroccanorganica.com${getLocalizedHref(`/organica/${slug}`, lang)}`,
-            }
+            alternates: buildAlternates(`/organica/${slug}`, lang),
         };
     }
 
@@ -220,9 +227,32 @@ export default async function CatalogueDetailPage({ params }: { params: Params }
     const localizedDetails = isRTL ? product.detailsAr : (lang === 'fr' ? product.detailsFr : product.details);
 
     const galleryImages = [product.image, ...product.gallery].filter(Boolean);
+    const pageUrl = `https://www.moroccanorganica.com${getLocalizedHref(`/organica/${slug}`, lang)}`;
+    const homeLabel = lang === 'ar' ? 'الرئيسية' : lang === 'fr' ? 'Accueil' : 'Home';
+    const productsLabel = lang === 'ar' ? 'المنتجات' : lang === 'fr' ? 'Produits' : 'Products';
 
     return (
         <main dir={isRTL ? "rtl" : "ltr"} className="pb-12 md:pb-20 bg-[#fefcf8]">
+            <Script
+                id={`organica-product-schema-${product.id}`}
+                strategy="afterInteractive"
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: renderSchemas(
+                        breadcrumbSchema([
+                            { name: homeLabel, url: `https://www.moroccanorganica.com${getLocalizedHref('/', lang)}` },
+                            { name: productsLabel, url: `https://www.moroccanorganica.com${getLocalizedHref('/wholesale-of-moroccan-skincare', lang)}` },
+                            { name: localizedName || "", url: pageUrl },
+                        ]),
+                        webPageSchema(
+                            product.metaTitle || localizedH1 || localizedName || "",
+                            product.metaDesc || localizedDescription || "",
+                            pageUrl,
+                            "ItemPage"
+                        )
+                    )
+                }}
+            />
             <InnerHero
                 title={localizedDescription || localizedName || ""}
                 description=""
@@ -230,7 +260,7 @@ export default async function CatalogueDetailPage({ params }: { params: Params }
                 backgroundImage={product.image || "/images/slider/hero-premium-organic-products.webp"}
                 titleTag="h2"
                 breadcrumbs={[
-                    { label: lang === 'ar' ? 'الرئيسية' : 'Home', href: getLocalizedHref('/', lang) },
+                    { label: homeLabel, href: getLocalizedHref('/', lang) },
                     { label: localizedName || "", href: getLocalizedHref(`/organica/${slug}`, lang) }
                 ]}
             />

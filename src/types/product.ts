@@ -57,6 +57,11 @@ export interface ProductWithTranslations {
 export interface ShopProductDB {
   id: string;
   slug: string;
+  slugs?: {
+    en: string;
+    fr: string;
+    ar: string;
+  };
   category: string;
   categorySlug: string;
   categoryColor?: string;

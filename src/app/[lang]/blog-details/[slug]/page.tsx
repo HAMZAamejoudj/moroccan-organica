@@ -14,6 +14,7 @@ import type { BlogPostFull } from "@/types/blog";
 import { getValidImageUrl, getLocalizedHref } from '@/lib/utils';
 import { BlogCard } from '@/components/blog/BlogCard';
 import { articleSchema, breadcrumbSchema, renderSchemas } from '@/lib/seo/schemas';
+import { buildAlternates } from '@/lib/seo/alternates';
 import { supabase } from '@/lib/supabase';
 
 export const revalidate = 2592000; // 30 days ISR (on-demand revalidation handles edits)
@@ -92,9 +93,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
             description: cleanDesc,
             images: image ? [image] : [],
         },
-        alternates: {
-            canonical: canonicalUrl,
-        },
+        alternates: buildAlternates(`/blog-details/${slug}`, lang),
     };
 }
 

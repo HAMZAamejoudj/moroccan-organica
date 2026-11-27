@@ -9,6 +9,8 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import Script from "next/script";
 import { organizationSchema, localBusinessSchema, renderSchemas } from "@/lib/seo/schemas";
+import { buildAlternates } from "@/lib/seo/alternates";
+import { getLocalizedHref } from "@/lib/utils";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -37,8 +39,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   const keywords = globalSeo?.translation?.defaultKeywords || "Argan oil, Argan oil benefits for skin, prickly pear oil, argan oil for hair, argan oil for face, pure argan oil, argan oil for skin, argan oil price, 100%pure,  bulk, beauty products, argan oil of morocco, beauty products online, beauty, beauty brand, cosmetic";
 
   const baseUrl = 'https://www.moroccanorganica.com';
-  const canonicalPath = lang === 'en' ? '' : `/${lang}`;
-  const canonicalUrl = `${baseUrl}${canonicalPath}`;
+  const canonicalUrl = `${baseUrl}${getLocalizedHref('/', lang)}`;
 
   return {
     metadataBase: new URL(baseUrl),
@@ -48,15 +49,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
     },
     description: defaultDesc,
     keywords: keywords,
-    alternates: {
-      canonical: canonicalUrl,
-      languages: {
-        'en': baseUrl,
-        'fr': `${baseUrl}/fr`,
-        'ar': `${baseUrl}/ar`,
-        'x-default': baseUrl,
-      },
-    },
+    alternates: buildAlternates('/', lang),
     openGraph: {
       type: 'website',
       siteName: siteName,
@@ -125,14 +118,14 @@ export default async function RootLayout({
                   "@id": "https://www.moroccanorganica.com/#website",
                   "name": "Moroccan Organica",
                   "alternateName": ["Organic Moroccan Beauty", "Argan Oil Wholesale Morocco"],
-                  "url": `https://www.moroccanorganica.com/${lang === 'en' ? '' : lang}`,
+                  "url": `https://www.moroccanorganica.com${getLocalizedHref('/', lang)}`,
                   "publisher": { "@id": "https://www.moroccanorganica.com/#organization" },
                   "inLanguage": lang === 'ar' ? 'ar' : (lang === 'fr' ? 'fr' : 'en'),
                   "potentialAction": {
                     "@type": "SearchAction",
                     "target": {
                       "@type": "EntryPoint",
-                      "urlTemplate": `https://www.moroccanorganica.com/${lang}/shop?q={search_term_string}`
+                      "urlTemplate": `https://www.moroccanorganica.com${getLocalizedHref('/shop', lang)}?q={search_term_string}`
                     },
                     "query-input": "required name=search_term_string"
                   },
@@ -140,27 +133,27 @@ export default async function RootLayout({
                     {
                       "@type": "SiteNavigationElement",
                       "name": "Shop",
-                      "url": `https://www.moroccanorganica.com/${lang}/shop`
+                      "url": `https://www.moroccanorganica.com${getLocalizedHref('/shop', lang)}`
                     },
                     {
                       "@type": "SiteNavigationElement",
                       "name": "About Us",
-                      "url": `https://www.moroccanorganica.com/${lang}/organica/about-organica-group-sarl`
+                      "url": `https://www.moroccanorganica.com${getLocalizedHref('/organica/about-organica-group-sarl', lang)}`
                     },
                     {
                       "@type": "SiteNavigationElement",
                       "name": "Private Label",
-                      "url": `https://www.moroccanorganica.com/${lang}/organica/argan-oil-private-label-manufacturer`
+                      "url": `https://www.moroccanorganica.com${getLocalizedHref('/organica/argan-oil-private-label-manufacturer', lang)}`
                     },
                     {
                       "@type": "SiteNavigationElement",
                       "name": "FAQ",
-                      "url": `https://www.moroccanorganica.com/${lang}/faq`
+                      "url": `https://www.moroccanorganica.com${getLocalizedHref('/faq', lang)}`
                     },
                     {
                       "@type": "SiteNavigationElement",
                       "name": "Contact",
-                      "url": `https://www.moroccanorganica.com/${lang}/contact`
+                      "url": `https://www.moroccanorganica.com${getLocalizedHref('/contact', lang)}`
                     }
                   ]
                 },

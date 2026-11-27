@@ -36,11 +36,5 @@ export function BlogPostViewTracker({ postId, title }: BlogPostViewTrackerProps)
         return () => window.clearTimeout(timer);
     }, [postId]);
 
-    useEffect(() => {
-        if (title && typeof document !== 'undefined') {
-            document.title = title;
-        }
-    }, [title]);
-
     return null;
 }

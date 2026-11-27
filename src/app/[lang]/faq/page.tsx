@@ -3,6 +3,7 @@ import FaqClient from "./FaqClient";
 import { getStaticPageBySystemName, getGlobalSeoSettings } from "@/lib/queries";
 import { Metadata } from "next";
 import { getLocalizedHref } from "@/lib/utils";
+import { buildAlternates } from "@/lib/seo/alternates";
 
 interface PageProps {
     params: Promise<{ lang: string }>;
@@ -28,9 +29,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
             images: page?.translation?.ogImage ? [page.translation.ogImage] : (globalSeo?.ogImage ? [globalSeo.ogImage] : []),
             url: `https://www.moroccanorganica.com${getLocalizedHref('/faq', lang)}`,
         },
-        alternates: {
-            canonical: page?.translation?.canonical || `https://www.moroccanorganica.com${getLocalizedHref('/faq', lang)}`,
-        }
+        alternates: buildAlternates('/faq', lang, page?.translation?.canonical),
     };
 }
 

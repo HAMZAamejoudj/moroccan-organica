@@ -23,6 +23,7 @@ function transformToShopProduct(product: any, preferredLang: LanguageCode = 'en'
     translations.find((t: any) => t.language === 'en') ||
     translations[0];
 
+  const enTranslation = translations.find((t: any) => t.language === 'en');
   const arTranslation = translations.find((t: any) => t.language === 'ar');
   const frTranslation = translations.find((t: any) => t.language === 'fr');
 
@@ -67,9 +68,16 @@ function transformToShopProduct(product: any, preferredLang: LanguageCode = 'en'
     ? variants.map((v: any) => v.sizeName).filter(Boolean).join(' · ')
     : (firstVariant?.sizeName || '');
 
+  const fallbackSlug = enTranslation?.slug || translation?.slug || product.sku;
+
   return {
     id: product.id,
     slug: translation?.slug || product.sku,
+    slugs: {
+      en: enTranslation?.slug || fallbackSlug,
+      fr: frTranslation?.slug || fallbackSlug,
+      ar: arTranslation?.slug || fallbackSlug,
+    },
     category: categoryTranslation?.name || 'Uncategorized',
     categorySlug: categoryTranslation?.slug || 'uncategorized',
     image: mainImage,

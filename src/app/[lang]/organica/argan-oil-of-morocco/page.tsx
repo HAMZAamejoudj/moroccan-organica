@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import { getStaticPageBySystemName, getGlobalSeoSettings } from "@/lib/queries";
 import ArganOilClient from "./ArganOilClient";
 import { getLocalizedHref } from "@/lib/utils";
+import { buildAlternates } from "@/lib/seo/alternates";
 
 const SLUG = "argan-oil-of-morocco";
 
@@ -52,11 +53,7 @@ export async function generateMetadata({
                     : [],
             url: `https://www.moroccanorganica.com${getLocalizedHref(`/organica/${SLUG}`, lang)}`,
         },
-        alternates: {
-            canonical:
-                page?.translation?.canonical ||
-                `https://www.moroccanorganica.com${getLocalizedHref(`/organica/${SLUG}`, lang)}`,
-        },
+        alternates: buildAlternates(`/organica/${SLUG}`, lang, page?.translation?.canonical),
     };
 }
 

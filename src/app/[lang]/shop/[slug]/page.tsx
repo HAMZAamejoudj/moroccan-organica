@@ -12,6 +12,7 @@ import { ShopProductDB } from "@/types/product";
 import { HtmlContent } from "@/components/common/HtmlContent";
 import { getLocalizedHref } from "@/lib/utils";
 import { productSchema, breadcrumbSchema, renderSchemas } from "@/lib/seo/schemas";
+import { buildLocalizedAlternates } from "@/lib/seo/alternates";
 import Script from "next/script";
 import { supabase } from "@/lib/supabase";
 
@@ -132,9 +133,15 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
             images: product.ogImage ? [product.ogImage] : (product.image ? [product.image] : (globalSeo?.ogImage ? [globalSeo.ogImage] : [])),
             url: `https://www.moroccanorganica.com${getLocalizedHref(`/shop/${slug}`, lang)}`,
         },
-        alternates: {
-            canonical: product.canonical || `https://www.moroccanorganica.com${getLocalizedHref(`/shop/${slug}`, lang)}`,
-        }
+        alternates: buildLocalizedAlternates(
+            {
+                en: `/shop/${product.slugs?.en || slug}`,
+                fr: `/shop/${product.slugs?.fr || slug}`,
+                ar: `/shop/${product.slugs?.ar || slug}`,
+            },
+            lang,
+            product.canonical
+        ),
     };
 }
 

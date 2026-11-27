@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { getGlobalSeoSettings } from "@/lib/queries";
 import { getLocalizedHref } from "@/lib/utils";
+import { buildLocalizedAlternates } from "@/lib/seo/alternates";
 import { supabase } from "@/lib/supabase";
 
 // On-demand revalidation handles edits; 30-day fallback prevents hourly ISR storms.
@@ -64,9 +65,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
             images: page.translation.ogImage ? [page.translation.ogImage] : (globalSeo?.ogImage ? [globalSeo.ogImage] : []),
             url: `https://www.moroccanorganica.com${getLocalizedHref(`/${slug}`, lang)}`,
         },
-        alternates: {
-            canonical: page.translation.canonical || `https://www.moroccanorganica.com${getLocalizedHref(`/${slug}`, lang)}`,
-        }
+        alternates: buildLocalizedAlternates(
+            {
+                en: `/${page.siblingSlugs?.en || slug}`,
+                fr: `/${page.siblingSlugs?.fr || slug}`,
+                ar: `/${page.siblingSlugs?.ar || slug}`,
+            },
+            lang,
+            page.translation.canonical
+        ),
     };
 }
 

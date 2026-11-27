@@ -4,6 +4,7 @@ import { Metadata } from "next";
 import { aboutPageData } from "@/data/about";
 import { getStaticPageBySystemName, getGlobalSeoSettings } from "@/lib/queries";
 import { getLocalizedHref } from "@/lib/utils";
+import { buildAlternates } from "@/lib/seo/alternates";
 import { breadcrumbSchema, webPageSchema, renderSchemas } from "@/lib/seo/schemas";
 import Script from "next/script";
 
@@ -48,9 +49,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
             images: page?.translation?.ogImage ? [page.translation.ogImage] : (globalSeo?.ogImage ? [globalSeo.ogImage] : []),
             url: `https://www.moroccanorganica.com${getLocalizedHref(`/organica/${slug}`, lang)}`,
         },
-        alternates: {
-            canonical: page?.translation?.canonical || `https://www.moroccanorganica.com${getLocalizedHref(`/organica/${slug}`, lang)}`,
-        }
+        alternates: buildAlternates(`/organica/${slug}`, lang, page?.translation?.canonical),
     };
 }
 

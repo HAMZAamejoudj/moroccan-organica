@@ -5,6 +5,7 @@ import { getStaticPageBySystemName, getGlobalSeoSettings } from "@/lib/queries";
 import type { Metadata } from "next";
 import { BenefitsClient } from "./BenefitsClient";
 import { getLocalizedHref } from "@/lib/utils";
+import { buildAlternates } from "@/lib/seo/alternates";
 
 /** Arabic SEO defaults when CMS has no BENEFITS translation for `ar`. */
 const AR_BENEFITS_META_TITLE = "فوائد منتجات التجميل المغربية الطبيعية للبشرة والشعر";
@@ -53,9 +54,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
             images: page?.translation?.ogImage ? [page.translation.ogImage] : (globalSeo?.ogImage ? [globalSeo.ogImage] : []),
             url: `https://www.moroccanorganica.com${getLocalizedHref('/organica/Benefits-Using-Natural-Beauty-Products', lang)}`,
         },
-        alternates: {
-            canonical: page?.translation?.canonical || `https://www.moroccanorganica.com${getLocalizedHref('/organica/Benefits-Using-Natural-Beauty-Products', lang)}`,
-        }
+        alternates: buildAlternates('/organica/Benefits-Using-Natural-Beauty-Products', lang, page?.translation?.canonical),
     };
 }
 

@@ -15,6 +15,7 @@ import { getDictionary } from "@/lib/dictionaries";
 import { getStaticPageBySystemName, getGlobalSeoSettings, getFeaturedProducts, getTopSaleProducts } from "@/lib/queries";
 import { getLocalizedHref } from "@/lib/utils";
 import { breadcrumbSchema } from "@/lib/seo/schemas";
+import { buildAlternates } from "@/lib/seo/alternates";
 import Script from "next/script";
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
@@ -38,9 +39,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
       type: 'website',
       url: `https://www.moroccanorganica.com${getLocalizedHref('/', lang)}`,
     },
-    alternates: {
-      canonical: page?.translation?.canonical || `https://www.moroccanorganica.com${getLocalizedHref('/', lang)}`,
-    }
+    alternates: buildAlternates('/', lang, page?.translation?.canonical),
   }
 }
 

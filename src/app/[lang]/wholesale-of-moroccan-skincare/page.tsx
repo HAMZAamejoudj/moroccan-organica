@@ -5,6 +5,7 @@ import InnerHero from "@/components/common/InnerHero";
 import ProductsSection from "@/components/sections/ProductsSection";
 import { homePageData } from "@/data/home";
 import { getLocalizedHref } from "@/lib/utils";
+import { buildAlternates } from "@/lib/seo/alternates";
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
     const { lang } = await params;
@@ -30,9 +31,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
             images: globalSeo?.ogImage ? [globalSeo.ogImage] : [],
             url: `https://www.moroccanorganica.com${getLocalizedHref('/wholesale-of-moroccan-skincare', lang)}`,
         },
-        alternates: {
-            canonical: `https://www.moroccanorganica.com${getLocalizedHref('/wholesale-of-moroccan-skincare', lang)}`,
-        }
+        alternates: buildAlternates('/wholesale-of-moroccan-skincare', lang),
     };
 }
 

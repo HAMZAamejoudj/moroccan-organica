@@ -16,41 +16,55 @@ export interface BlogPostTimelineProps {
   recommendedTitle?: string;
 }
 
+function decodeHtmlEntities(text: string): string {
+  return text
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;|&apos;/g, "'")
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&#(\d+);/g, (_, dec) => String.fromCharCode(Number(dec)))
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
+}
+
+function generateId(text: string, fallbackIndex: number): string {
+  const slug = text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^\p{L}\p{N}]+/gu, '-')
+    .replace(/^-+|-+$/g, '');
+
+  return slug || `section-${fallbackIndex}`;
+}
+
 function extractHeadings(html: string | null): TimelineItem[] {
   if (!html || typeof html !== 'string') return [];
 
   const headings: TimelineItem[] = [];
   const idCounts: Record<string, number> = {};
 
-  // For server-side rendering, we could use a regex or just skip.
-  // Since this is used in useMemo in a client component, we use DOMParser.
-  if (typeof window === 'undefined') return [];
+  // Parse headings deterministically on both SSR and client to avoid React hydration mismatch (#418)
+  const headingRegex = /<h([1-6])(?:\s[^>]*)?>([\s\S]*?)<\/h\1>/gi;
+  let match: RegExpExecArray | null;
+  let index = 0;
 
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, 'text/html');
-  const headingElements = doc.querySelectorAll('h1, h2, h3, h4, h5, h6');
+  while ((match = headingRegex.exec(html)) !== null) {
+    index += 1;
+    const level = parseInt(match[1], 10);
+    const rawInner = match[2] || '';
+    const text = decodeHtmlEntities(rawInner.replace(/<[^>]*>/g, '')).replace(/\s+/g, ' ').trim();
 
-  headingElements.forEach((el) => {
-    const level = parseInt(el.tagName.substring(1));
-    const text = el.textContent || '';
     if (text) {
-      const baseId = generateId(text);
+      const baseId = generateId(text, index);
       idCounts[baseId] = (idCounts[baseId] || 0) + 1;
       const id = idCounts[baseId] === 1 ? baseId : `${baseId}-${idCounts[baseId]}`;
       headings.push({ id, text, level });
     }
-  });
+  }
 
   return headings;
-}
-
-function generateId(text: string): string {
-  return text
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
 }
 
 export function BlogPostTimeline({
@@ -64,7 +78,20 @@ export function BlogPostTimeline({
   useEffect(() => {
     if (headings.length === 0) return;
 
+    let disconnectObserver: (() => void) | undefined;
+
     const setupObserver = () => {
+      // Ensure rendered article headings have matching IDs so TOC scroll & IntersectionObserver work
+      const articleRoot = document.querySelector('article .rich-text-content');
+      if (articleRoot) {
+        const renderedHeadings = articleRoot.querySelectorAll('h1, h2, h3, h4, h5, h6');
+        renderedHeadings.forEach((el, idx) => {
+          if (!el.id && headings[idx]) {
+            el.id = headings[idx].id;
+          }
+        });
+      }
+
       const observer = new IntersectionObserver(
         (entries) => {
           const intersecting = entries
@@ -86,11 +113,14 @@ export function BlogPostTimeline({
         if (element) observer.observe(element);
       });
 
-      return () => observer.disconnect();
+      disconnectObserver = () => observer.disconnect();
     };
 
-    const timeout = setTimeout(setupObserver, 500);
-    return () => clearTimeout(timeout);
+    const timeout = setTimeout(setupObserver, 250);
+    return () => {
+      clearTimeout(timeout);
+      disconnectObserver?.();
+    };
   }, [headings]);
 
   const scrollToSection = (id: string) => {

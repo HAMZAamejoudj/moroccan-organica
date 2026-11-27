@@ -32,7 +32,7 @@ export async function proxy(req: NextRequest) {
             }
 
             if (token?.role !== 'ADMIN') {
-                return NextResponse.redirect(new URL('/en', req.url));
+                return NextResponse.redirect(new URL('/', req.url));
             }
         }
     }

@@ -120,19 +120,21 @@ const nextConfig: NextConfig = {
           source: '/:lang(en|ar|fr)/api/auth/:path*',
           destination: '/api/auth/:path*',
         },
-      ],
-      afterFiles: [
-        // Rewrite default English root path at the Edge CDN (0ms Fluid CPU)
+        // Rewrite default English root path at the Edge CDN (0ms Fluid CPU).
+        // Runs in beforeFiles so Vercel resolves App Router RSC payloads
+        // (/en.rsc & segment prefetches) before filesystem checks.
         {
           source: '/',
           destination: '/en',
         },
-        // Rewrite locale-less public paths to /en/... at the Edge CDN (0ms Fluid CPU)
+        // Rewrite locale-less public paths to /en/... at the Edge CDN (0ms Fluid CPU).
+        // Excludes locales, internal Next/Vercel routes, auth/admin/api, and static assets.
         {
-          source: '/:path((?!en(?:/|$)|ar(?:/|$)|fr(?:/|$)|api(?:/|$)|admin(?:/|$)|login(?:/|$)|_next(?:/|$)|.*\\.).*)',
+          source: '/:path((?!en(?:/|$)|ar(?:/|$)|fr(?:/|$)|api(?:/|$)|admin(?:/|$)|login(?:/|$)|_next(?:/|$)|_vercel(?:/|$)|_not-found(?:/|$)|_global-error(?:/|$)|images(?:/|$)|.*\\.).*)',
           destination: '/en/:path',
         },
       ],
+      afterFiles: [],
       fallback: [],
     };
   },

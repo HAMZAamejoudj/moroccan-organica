@@ -22,17 +22,12 @@ export async function GET(request: Request) {
     const path = searchParams.get('path');
 
     if (tag) {
-      // @ts-ignore
-      revalidateTag(tag);
+      revalidateTag(tag, 'default');
     } else {
-      // @ts-ignore
-      revalidateTag(CACHE_TAGS.PRODUCTS);
-      // @ts-ignore
-      revalidateTag('products');
-      // @ts-ignore
-      revalidateTag(CACHE_TAGS.BLOG_POSTS);
-      // @ts-ignore
-      revalidateTag('blog_posts');
+      revalidateTag(CACHE_TAGS.PRODUCTS, 'default');
+      revalidateTag('products', 'default');
+      revalidateTag(CACHE_TAGS.BLOG_POSTS, 'default');
+      revalidateTag('blog_posts', 'default');
     }
 
     if (path) {

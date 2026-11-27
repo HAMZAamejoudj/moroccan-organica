@@ -53,7 +53,21 @@ export function getValidImageUrl(url: string | null | undefined, fallback: strin
 }
 
 export function getLocalizedHref(path: string, lang: string): string {
-    const cleanPath = path.startsWith('/') ? path : `/${path}`;
+    if (!path) return lang === 'en' ? '/' : `/${lang}`;
+    if (
+        path.startsWith('#') ||
+        path.startsWith('http://') ||
+        path.startsWith('https://') ||
+        path.startsWith('mailto:') ||
+        path.startsWith('tel:')
+    ) {
+        return path;
+    }
+
+    let cleanPath = path.startsWith('/') ? path : `/${path}`;
+    // Strip any existing locale prefix (/en, /fr, /ar) so calling getLocalizedHref twice never double-prefixes
+    cleanPath = cleanPath.replace(/^\/(en|fr|ar)(?=\/|$)/, '') || '/';
+
     if (lang === 'en') return cleanPath;
     return `/${lang}${cleanPath === '/' ? '' : cleanPath}`;
 }

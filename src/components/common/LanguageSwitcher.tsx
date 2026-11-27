@@ -11,7 +11,11 @@ import {
 import { ChevronDown } from "lucide-react";
 import ReactCountryFlag from "react-country-flag";
 
-const LanguageSwitcher = () => {
+interface LanguageSwitcherProps {
+    onSelect?: () => void;
+}
+
+const LanguageSwitcher = ({ onSelect }: LanguageSwitcherProps = {}) => {
     const pathname = usePathname();
     const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
@@ -30,7 +34,7 @@ const LanguageSwitcher = () => {
     const currentLanguage = languages.find(lang => (lang.langCode || lang.code) === currentLang) || languages[0];
 
     const changeLanguage = (langCode: string) => {
-        let segments = pathname.split('/').filter(Boolean);
+        const segments = pathname.split('/').filter(Boolean);
 
         // Remove existing locale if present
         if (['ar', 'fr', 'en'].includes(segments[0])) {
@@ -43,8 +47,9 @@ const LanguageSwitcher = () => {
         }
 
         const newPath = `/${segments.join('/')}`;
-        router.push(newPath || '/');
         setIsOpen(false);
+        onSelect?.();
+        router.push(newPath || '/');
     };
 
     return (
@@ -86,7 +91,7 @@ const LanguageSwitcher = () => {
                             aria-hidden="true"
                         />
                         <span className="text-white text-sm font-medium">{lang.name}</span>
-                        {currentLang === lang.code && (
+                        {currentLang === (lang.langCode || lang.code) && (
                             <span className="ms-auto text-primary text-xs">✓</span>
                         )}
                     </DropdownMenuItem>

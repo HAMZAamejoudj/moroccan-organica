@@ -55,12 +55,15 @@ const copy = {
         email: "Email",
         phone: "Téléphone",
         productType: "Type de Produit",
-        quantity: "Combien d'articles/kg ?",
-        destination: "Destination",
+        quantity: "Quantité",
+        liters: "Litres / Kg / Unités",
+        destination: "Destination (Pays/Ville)",
         message: "Votre Message",
         send: "ENVOYER",
         submitting: "ENVOI...",
-        success: "Demande de devis envoyée avec succès !",
+        successTitle: "Demande de devis envoyée !",
+        successMessage: "Nous vous répondrons avec un devis sous 24 heures.",
+        sendAnother: "Envoyer une autre demande"
     }
 } as const;
 

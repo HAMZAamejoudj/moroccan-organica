@@ -31,20 +31,40 @@ const copy = {
 
 type LangKey = keyof typeof copy;
 
+const MODAL_SEEN_KEY = "moroccan_organica_promo_modal_seen";
+
 export function MarketingModal({ lang }: MarketingModalProps) {
     const [isOpen, setIsOpen] = useState(false);
     const t = copy[(lang as LangKey)] || copy.en;
+
+    const markSeen = () => {
+        try {
+            localStorage.setItem(MODAL_SEEN_KEY, "1");
+        } catch {
+            // Ignore storage errors in private browsing modes
+        }
+    };
 
     const openWhatsApp = () => {
         const phoneNumber = "212648273228";
         const message = "Hello! I'm interested in your products.";
         const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+        markSeen();
         window.open(url, "_blank");
         setIsOpen(false);
     };
 
     useEffect(() => {
+        try {
+            if (localStorage.getItem(MODAL_SEEN_KEY) === "1") {
+                return;
+            }
+        } catch {
+            // Continue if localStorage is unavailable
+        }
+
         const timer = setTimeout(() => {
+            markSeen();
             setIsOpen(true);
         }, 5000);
 
@@ -53,7 +73,10 @@ export function MarketingModal({ lang }: MarketingModalProps) {
 
     if (!isOpen) return null;
 
-    const handleClose = () => setIsOpen(false);
+    const handleClose = () => {
+        markSeen();
+        setIsOpen(false);
+    };
 
     return (
         <>

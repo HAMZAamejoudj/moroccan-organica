@@ -215,7 +215,8 @@ const Header = ({ dict, lang, topProducts = [] }: HeaderProps) => {
                     </div>
 
                     {/* Mobile Menu Button */}
-                    <div className="flex xl:hidden items-center gap-3">
+                    <div className="flex xl:hidden items-center gap-2">
+                        <LanguageSwitcher onSelect={() => setIsMenuOpen(false)} />
                         <CartDrawer isRTL={isRTL} lang={lang} />
                         <button
                             className="p-2 text-white cursor-pointer hover:bg-white/10 rounded-lg transition-colors"
@@ -290,7 +291,7 @@ const Header = ({ dict, lang, topProducts = [] }: HeaderProps) => {
                             {/* Mobile Utilities */}
                             <div className={`flex flex-col gap-6 pt-6 mt-4 border-t border-border/10 ${isRTL ? 'items-end' : 'items-start'}`}>
                                 <div className={`flex items-center gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                                    <LanguageSwitcher />
+                                    <LanguageSwitcher onSelect={() => setIsMenuOpen(false)} />
                                 </div>
                                 <div className="flex items-center gap-3">
                                     {socialLinks.map((social) => (

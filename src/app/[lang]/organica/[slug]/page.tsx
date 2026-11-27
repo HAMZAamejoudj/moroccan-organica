@@ -99,6 +99,26 @@ const copy = {
         backToProducts: "الرجوع لأورغانيكا",
         viewDetails: "عرض التفاصيل",
     },
+    fr: {
+        breadcrumbHome: "Organica",
+        specs: "Spécifications",
+        highlights: "Points forts",
+        requestQuote: "Demander un devis en gros",
+        whatsapp: "Discuter sur WhatsApp",
+        descriptionTitle: "Histoire du produit",
+        relatedTitle: "Autres produits de la collection",
+        badgeFeatured: "Produit vedette",
+        badgeTopSale: "Meilleure vente",
+        volume: "Format",
+        category: "Catégorie",
+        price: "Prix",
+        certification: "Certifications",
+        fulfillment: "Expédition",
+        fulfillmentValue: "Expédié sous 4 à 9 jours ouvrés",
+        certificationValue: "ISO 22716 · ECOCERT · USDA Organic. COA.SDS.",
+        backToProducts: "Retour à Organica",
+        viewDetails: "Voir les détails",
+    },
 } as const;
 
 import { benefitsData } from "@/data/benefits";
@@ -219,7 +239,7 @@ export default async function CatalogueDetailPage({ params }: { params: Params }
     }
 
     const isRTL = lang === "ar";
-    const t = copy[isRTL ? "ar" : "en"];
+    const t = copy[lang === "ar" ? "ar" : lang === "fr" ? "fr" : "en"];
 
     const localizedName = isRTL ? product.nameAr : product.name;
     const localizedH1 = isRTL ? product.h1Ar : (lang === 'fr' ? product.h1Fr : product.h1);
